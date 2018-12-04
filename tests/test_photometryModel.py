@@ -322,10 +322,12 @@ class ConstrainedFluxModelTestCase(ConstrainedPhotometryModelTestCase,
         self.assertFalse(self.model.checkPositiveOnBBox(self.ccdImageList[0]))
 
     def test_validate(self):
-        self.assertTrue(self.model.validate(self.ccdImageList))
-        # Make the model go negative
+        # Model has 20 parameters (2 visits, 10 params each)
+        self.assertTrue(self.model.validate(self.ccdImageList, 1))
+        self.assertFalse(self.model.validate(self.ccdImageList, 0))
+        # Make the model go negative on the bounding box
         self.model.offsetParams(-5*self.delta)
-        self.assertFalse(self.model.validate(self.ccdImageList))
+        self.assertFalse(self.model.validate(self.ccdImageList, 100))
 
 
 class ConstrainedMagnitudeModelTestCase(ConstrainedPhotometryModelTestCase,

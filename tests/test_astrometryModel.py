@@ -390,6 +390,12 @@ class ConstrainedAstrometryModelTestCase(AstrometryModelTestBase, lsst.utils.tes
         self.checkGetVisitTransform(self.model1)
         self.checkGetVisitTransform(self.model2)
 
+    def test_validate(self):
+        # Model1 has 70 parameters (2 visits*20 params + (6-1) sensors*5 params)
+        # so we need 70+1 degrees of freedom to fit it.
+        self.assertTrue(self.model1.validate(self.ccdImageList, 1))
+        self.assertFalse(self.model1.validate(self.ccdImageList, 0))
+
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
