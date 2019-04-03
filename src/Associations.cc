@@ -23,6 +23,7 @@
  */
 
 #include <cmath>
+#include <math.h>  // for isnan
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -170,15 +171,24 @@ void Associations::associateCatalogs(const double matchCutInArcSec, const bool u
 }
 
 void Associations::collectRefStars(afw::table::SimpleCatalog &refCat, afw::geom::Angle matchCut,
-                                   std::string const &fluxField, bool rejectBadFluxes) {
+                                   std::string const &fluxField, float const refCoordinateErr,
+                                   bool rejectBadFluxes) {
     if (refCat.size() == 0) {
         throw(LSST_EXCEPT(pex::exceptions::InvalidParameterError,
                           " reference catalog is empty : stop here "));
     }
 
     afw::table::CoordKey coordKey = refCat.getSchema()["coord"];
+    // Handle reference catalogs that don't have position errors.
+    afw::table::Key<double> raErrKey;
+    afw::table::Key<double> decErrKey;
+    if (isnan(refCoordinateErr)) {
+        raErrKey = refCat.getSchema().find<double>("coord_ra_err").key;
+        decErrKey = refCat.getSchema().find<double>("coord_dec_err").key;
+    }
+
     auto fluxKey = refCat.getSchema().find<double>(fluxField).key;
-    // Don't blow up if the reference catalog doesn't contain errors.
+    // Handle reference catalogs that don't have flux errors.
     afw::table::Key<double> fluxErrKey;
     try {
         fluxErrKey = refCat.getSchema().find<double>(fluxField + "Err").key;
@@ -204,12 +214,15 @@ void Associations::collectRefStars(afw::table::SimpleCatalog &refCat, afw::geom:
         double dec = lsst::afw::geom::radToDeg(coord.getLatitude());
         auto star = std::make_shared<RefStar>(ra, dec, flux, fluxErr);
 
-        // TODO DM-10826: RefCats aren't guaranteed to have position errors.
-        // TODO: Need to devise a way to check whether the refCat has position errors
-        // TODO: and use them instead, if available.
-        // cook up errors: 100 mas per cooordinate
-        star->vx = std::pow(0.1 / 3600 / cos(coord.getLatitude()), 2);
-        star->vy = std::pow(0.1 / 3600, 2);
+        if (isnan(refCoordinateErr)) {
+            star->vx = record->get(raErrKey);
+            star->vy = record->get(decErrKey);
+        } else {
+            // Add fake errors when the catalog has none
+            star->vx = std::pow(refCoordinateErr / 3600. / cos(coord.getLatitude()), 2);
+            star->vy = std::pow(refCoordinateErr / 3600, 2);
+        }
+        // TODO: cook up a covariance as none of our current refcats have it
         star->vxy = 0.;
 
         // Reject sources with non-finite fluxes and flux errors, and fluxErr=0 (which gives chi2=inf).

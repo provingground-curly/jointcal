@@ -290,6 +290,13 @@ class JointcalConfig(pexConfig.Config):
         target=ReferenceSourceSelectorTask,
         doc="How to down-select the loaded photometry reference catalog.",
     )
+    astrometryReferenceErr = pexConfig.Field(
+        doc="Uncertainty on reference catalog coordinates [mas] if they do not have `coord_*_err` fields."
+            " If None, then raise an exception if the reference catalog is missing coordinate errors.",
+        dtype=float,
+        default=None,
+        optional=True
+    )
     writeInitMatrix = pexConfig.Field(
         dtype=bool,
         doc="Write the pre/post-initialization Hessian and gradient to text files, for debugging."
@@ -606,8 +613,16 @@ class JointcalTask(pipeBase.CmdLineTask):
                                                          center, radius, defaultFilter,
                                                          applyColorterms=applyColorterms)
 
-        associations.collectRefStars(refCat, self.config.matchCut*afwGeom.arcseconds,
-                                     fluxField, reject_bad_fluxes)
+        if self.config.astrometryReferenceErr is None:
+            refCoordErr = float('nan')
+        else:
+            refCoordErr = self.config.astrometryReferenceErr
+
+        associations.collectRefStars(refCat,
+                                     self.config.matchCut*afwGeom.arcseconds,
+                                     fluxField,
+                                     refCoordinateErr=refCoordErr,
+                                     rejectBadFluxes=reject_bad_fluxes)
         add_measurement(self.job, 'jointcal.collected_%s_refStars' % name,
                         associations.refStarListSize())
 
@@ -670,6 +685,17 @@ class JointcalTask(pipeBase.CmdLineTask):
             refCat = selected.sourceCat.copy(deep=True)
         else:
             refCat = selected.sourceCat
+
+        if self.config.astrometryReferenceErr is None and 'coord_ra_err' not in refCat.schema:
+            #####################
+            # TODO: is KeyError really the best thing to raise here?
+            # RuntimeError also feels too generic, but may be better?
+            #####################
+            raise KeyError("Reference catalog does not contain coordinate errors, and"
+                           "config.astrometryReferenceErr not supplied.")
+        if self.config.astrometryReferenceErr is not None and 'coord_ra_err' in refCat.schema:
+            self.log.warn("Overriding reference catalog coordinate errors with %f/coordinate [mas]",
+                          self.config.astrometryReferenceErr)
 
         if applyColorterms:
             try:
