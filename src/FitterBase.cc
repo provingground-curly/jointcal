@@ -187,6 +187,10 @@ MinimizeResult FitterBase::minimize(std::string const &whatToFit, double nSigmaC
 
     LOGLS_DEBUG(_log, "End of triplet filling, ntrip = " << tripletList.size());
 
+    if (dumpMatrixFile != "") {
+        tripletList.dumpToFile(dumpMatrixFile + "-triplets.fits");
+    }
+
     SparseMatrixD hessian = createHessian(_nParTot, tripletList);
     tripletList.clear();  // we don't need it any more after we have the hessian.
 

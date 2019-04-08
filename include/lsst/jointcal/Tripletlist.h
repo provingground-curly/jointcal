@@ -29,6 +29,8 @@
 
 #include <vector>
 
+#include "lsst/afw/table.h"
+
 namespace lsst {
 namespace jointcal {
 
@@ -45,6 +47,22 @@ public:
     unsigned getNextFreeIndex() const { return _nextFreeIndex; }
 
     void setNextFreeIndex(unsigned index) { _nextFreeIndex = index; }
+
+    void dumpToFile(std::string const& filename) {
+        afw::table::Schema schema;
+        auto col = schema.addField<int>("col", "column index", "pixel");
+        auto row = schema.addField<int>("row", "row index", "pixel");
+        auto value = schema.addField<double>("value", "matrix value");
+        afw::table::BaseCatalog catalog{schema};
+        catalog.reserve(size());
+        for (auto & triplet : *this) {
+            auto record = catalog.addNew();
+            record->set(col, triplet.col());
+            record->set(row, triplet.row());
+            record->set(value, triplet.value());
+        }
+        catalog.writeFits(filename);
+    }
 
 private:
     unsigned _nextFreeIndex;
