@@ -32,7 +32,7 @@
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, 2> MatrixX2d;
 
-typedef Eigen::SparseMatrix<double> SparseMatrixD;
+typedef Eigen::SparseMatrix<double, 0, Eigen::Index> SparseMatrixD;
 
 /* Cholesky factorization class using cholmod, with the small-rank update capability.
  *

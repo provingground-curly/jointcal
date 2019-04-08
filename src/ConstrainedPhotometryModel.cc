@@ -41,8 +41,11 @@
 namespace lsst {
 namespace jointcal {
 
-unsigned ConstrainedPhotometryModel::assignIndices(std::string const &whatToFit, unsigned firstIndex) {
-    unsigned index = firstIndex;
+Eigen::Index ConstrainedPhotometryModel::assignIndices(
+    std::string const &whatToFit,
+    Eigen::Index firstIndex
+) {
+    Eigen::Index index = firstIndex;
     if (whatToFit.find("Model") == std::string::npos) {
         LOGLS_WARN(_log, "assignIndices was called and Model is *not* in whatToFit");
         return index;
@@ -105,7 +108,7 @@ void ConstrainedPhotometryModel::freezeErrorTransform() {
 }
 
 void ConstrainedPhotometryModel::getMappingIndices(CcdImage const &ccdImage,
-                                                   std::vector<unsigned> &indices) const {
+                                                   std::vector<Eigen::Index> &indices) const {
     auto mapping = findMapping(ccdImage);
     mapping->getMappingIndices(indices);
 }

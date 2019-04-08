@@ -274,12 +274,12 @@ void Associations::associateRefStars(double matchCutInArcSec, const AstrometryTr
                "Associated " << starMatchList->size() << " reference stars among " << refStarList.size());
 }
 
-void Associations::prepareFittedStars(int minMeasurements) {
+void Associations::prepareFittedStars(std::size_t minMeasurements) {
     selectFittedStars(minMeasurements);
     normalizeFittedStars();
 }
 
-void Associations::selectFittedStars(int minMeasurements) {
+void Associations::selectFittedStars(std::size_t minMeasurements) {
     LOGLS_INFO(_log, "Fitted stars before measurement # cut: " << fittedStarList.size());
 
     // first pass: remove objects that have less than a certain number of measurements.

@@ -35,8 +35,8 @@
 namespace lsst {
 namespace jointcal {
 
-unsigned SimplePhotometryModel::assignIndices(std::string const &whatToFit, unsigned firstIndex) {
-    unsigned ipar = firstIndex;
+Eigen::Index SimplePhotometryModel::assignIndices(std::string const &whatToFit, Eigen::Index firstIndex) {
+    Eigen::Index ipar = firstIndex;
     for (auto const &i : _myMap) {
         auto mapping = i.second.get();
         mapping->setIndex(ipar);
@@ -59,7 +59,7 @@ void SimplePhotometryModel::freezeErrorTransform() {
 }
 
 void SimplePhotometryModel::getMappingIndices(CcdImage const &ccdImage,
-                                              std::vector<unsigned> &indices) const {
+                                              std::vector<Eigen::Index> &indices) const {
     auto mapping = findMapping(ccdImage);
     if (indices.size() < mapping->getNpar()) indices.resize(mapping->getNpar());
     indices[0] = mapping->getIndex();

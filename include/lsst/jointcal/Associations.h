@@ -157,7 +157,7 @@ public:
      *
      * @param[in]  minMeasurements  The minimum number of measuredStars for a FittedStar to be included.
      */
-    void prepareFittedStars(int minMeasurements);
+    void prepareFittedStars(std::size_t minMeasurements);
 
     CcdImageList const &getCcdImageList() const { return ccdImageList; }
 
@@ -187,7 +187,7 @@ private:
      *
      * @param[in]  minMeasurements  The minimum number of measuredStars for a FittedStar to be included.
      */
-    void selectFittedStars(int minMeasurements);
+    void selectFittedStars(std::size_t minMeasurements);
 
     /**
      * Make fitted star positions and fluxes be the average of their measured stars.

@@ -67,7 +67,7 @@ public:
     const AstrometryMapping *getMapping(CcdImage const &) const override;
 
     //! Positions the various parameter sets into the parameter vector, starting at firstIndex
-    unsigned assignIndices(std::string const &whatToFit, unsigned firstIndex) override;
+    Eigen::Index assignIndices(std::string const &whatToFit, Eigen::Index firstIndex) override;
 
     // dispaches the offsets after a fit step into the actual locations of parameters
     void offsetParams(Eigen::VectorXd const &delta) override;

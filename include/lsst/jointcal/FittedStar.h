@@ -28,6 +28,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "Eigen/Core"
 #include "lsst/jointcal/BaseStar.h"
 #include "lsst/jointcal/StarList.h"
 
@@ -92,17 +93,17 @@ public:
     }
 
     //!
-    int getMeasurementCount() const { return _measurementCount; }
-    int& getMeasurementCount() { return _measurementCount; }
+    std::size_t getMeasurementCount() const { return _measurementCount; }
+    std::size_t& getMeasurementCount() { return _measurementCount; }
 
     /// Add a measuredStar on-sky magnitude.
     void addMagMeasurement(double magValue, double magWeight);
 
     //! index is a value that a fit can set and reread....
-    void setIndexInMatrix(const unsigned& index) { _indexInMatrix = index; };
+    void setIndexInMatrix(Eigen::Index const index) { _indexInMatrix = index; };
 
     //!
-    int getIndexInMatrix() const { return _indexInMatrix; }
+    Eigen::Index getIndexInMatrix() const { return _indexInMatrix; }
 
     //! Set the astrometric reference star associated with this star.
     void setRefStar(const RefStar* _refStar);
@@ -111,8 +112,8 @@ public:
     const RefStar* getRefStar() const { return _refStar; };
 
 private:
-    unsigned _indexInMatrix;
-    int _measurementCount;
+    Eigen::Index _indexInMatrix;
+    std::size_t _measurementCount;
     const RefStar* _refStar;
 };
 
