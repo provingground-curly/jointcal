@@ -84,7 +84,7 @@ public:
     void freezeErrorTransform() override;
 
     /// @copydoc AstrometryModel::getTotalParameters
-    int getTotalParameters() const override;
+    std::size_t getTotalParameters() const override;
 
     //! Access to mappings
     AstrometryTransform const &getTransform(CcdImage const &ccdImage) const;

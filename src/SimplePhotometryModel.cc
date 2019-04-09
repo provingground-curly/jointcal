@@ -65,8 +65,8 @@ void SimplePhotometryModel::getMappingIndices(CcdImage const &ccdImage,
     indices[0] = mapping->getIndex();
 }
 
-int SimplePhotometryModel::getTotalParameters() const {
-    int total = 0;
+std::size_t SimplePhotometryModel::getTotalParameters() const {
+    std::size_t total = 0;
     for (auto &i : _myMap) {
         total += i.second->getNpar();
     }

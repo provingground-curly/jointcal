@@ -127,8 +127,8 @@ void SimpleAstrometryModel::freezeErrorTransform() {
     for (auto &i : _myMap) i.second->freezeErrorTransform();
 }
 
-int SimpleAstrometryModel::getTotalParameters() const {
-    int total = 0;
+std::size_t SimpleAstrometryModel::getTotalParameters() const {
+    std::size_t total = 0;
     for (auto &i : _myMap) {
         total += i.second->getNpar();
     }

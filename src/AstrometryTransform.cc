@@ -213,21 +213,21 @@ std::unique_ptr<AstrometryTransform> AstrometryTransform::roughInverse(const Fra
 
 // not dummy : what it does is virtual because paramRef is virtual.
 void AstrometryTransform::getParams(double *params) const {
-    int npar = getNpar();
-    for (int i = 0; i < npar; ++i) params[i] = paramRef(i);
+    std::size_t npar = getNpar();
+    for (std::size_t i = 0; i < npar; ++i) params[i] = paramRef(i);
 }
 
 void AstrometryTransform::offsetParams(Eigen::VectorXd const &delta) {
-    int npar = getNpar();
-    for (int i = 0; i < npar; ++i) paramRef(i) += delta[i];
+    std::size_t npar = getNpar();
+    for (std::size_t i = 0; i < npar; ++i) paramRef(i) += delta[i];
 }
 
-double AstrometryTransform::paramRef(const int) const {
+double AstrometryTransform::paramRef(Eigen::Index const) const {
     throw LSST_EXCEPT(pex::exceptions::InvalidParameterError,
                       std::string("AstrometryTransform::paramRef should never be called "));
 }
 
-double &AstrometryTransform::paramRef(const int) {
+double &AstrometryTransform::paramRef(Eigen::Index const) {
     throw LSST_EXCEPT(pex::exceptions::InvalidParameterError,
                       "AstrometryTransform::paramRef should never be called ");
 }
@@ -760,20 +760,20 @@ double AstrometryTransformPolynomial::coeffOrZero(const unsigned degX, const uns
 }
 
 /* parameter serialization for "virtual" fits */
-double AstrometryTransformPolynomial::paramRef(const int i) const {
-    assert(unsigned(i) < 2 * _nterms);
+double AstrometryTransformPolynomial::paramRef(Eigen::Index const i) const {
+    assert(i < 2 * _nterms);
     return _coeffs[i];
 }
 
-double &AstrometryTransformPolynomial::paramRef(const int i) {
-    assert(unsigned(i) < 2 * _nterms);
+double &AstrometryTransformPolynomial::paramRef(Eigen::Index const i) {
+    assert(i < 2 * _nterms);
     return _coeffs[i];
 }
 
 void AstrometryTransformPolynomial::paramDerivatives(Point const &where, double *dx, double *dy)
         const { /* first half : dxout/dpar, second half : dyout/dpar */
     computeMonomials(where.x, where.y, dx);
-    for (unsigned k = 0; k < _nterms; ++k) {
+    for (std::size_t k = 0; k < _nterms; ++k) {
         dy[_nterms + k] = dx[k];
         dx[_nterms + k] = dy[k] = 0;
     }
@@ -1111,8 +1111,8 @@ void AstrometryTransformPolynomial::read(istream &s) {
 }
 
 ndarray::Array<double, 2, 2> AstrometryTransformPolynomial::toAstPolyMapCoefficients() const {
-    int nCoeffs = _coeffs.size();
-    ndarray::Array<double, 2, 2> result = ndarray::allocate(ndarray::makeVector(nCoeffs, 4));
+    std::size_t nCoeffs = _coeffs.size();
+    ndarray::Array<double, 2, 2> result = ndarray::allocate(ndarray::makeVector(nCoeffs, std::size_t(4)));
 
     ndarray::Size k = 0;
     for (unsigned iCoord = 0; iCoord < 2; ++iCoord) {
@@ -1279,7 +1279,7 @@ double AstrometryTransformLinearRot::fit(StarMatchList const &) {
 }
 
 double AstrometryTransformLinearShift::fit(StarMatchList const &starMatchList) {
-    int npairs = starMatchList.size();
+    std::size_t npairs = starMatchList.size();
     if (npairs < 3) {
         LOGLS_FATAL(_log, "AstrometryTransformLinearShift::fit trying to fit a linear transform with only "
                                   << npairs << " matches.");

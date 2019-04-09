@@ -83,7 +83,7 @@ public:
     void getMappingIndices(CcdImage const &ccdImage, std::vector<Eigen::Index> &indices) const override;
 
     /// @copydoc PhotometryModel::getTotalParameters
-    int getTotalParameters() const override;
+    std::size_t getTotalParameters() const override;
 
     /// @copydoc PhotometryModel::computeParameterDerivatives
     void computeParameterDerivatives(MeasuredStar const &measuredStar, CcdImage const &ccdImage,

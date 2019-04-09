@@ -162,10 +162,10 @@ public:
     void offsetParams(Eigen::VectorXd const &delta);
 
     //!
-    virtual double paramRef(const int i) const;
+    virtual double paramRef(Eigen::Index const i) const;
 
     //!
-    virtual double &paramRef(const int i);
+    virtual double &paramRef(Eigen::Index const i);
 
     //! Derivative w.r.t parameters. Derivatives should be al least 2*NPar long. first Npar, for x, last Npar
     //! for y.
@@ -177,7 +177,7 @@ public:
     virtual std::unique_ptr<AstrometryTransform> roughInverse(const Frame &region) const;
 
     //! returns the number of parameters (to compute chi2's)
-    virtual int getNpar() const { return 0; }
+    virtual std::size_t getNpar() const { return 0; }
 
     /**
      * Create an equivalent AST mapping for this transformation, including an analytic inverse if possible.
@@ -240,7 +240,7 @@ public:
 
     void dump(std::ostream &stream = std::cout) const override { stream << "x' = x\ny' = y" << std::endl; }
 
-    int getNpar() const override { return 0; }
+    std::size_t getNpar() const override { return 0; }
 
     std::unique_ptr<AstrometryTransform> clone() const override {
         return std::unique_ptr<AstrometryTransform>(new AstrometryTransformIdentity);
@@ -320,7 +320,7 @@ public:
     virtual void transformPosAndErrors(const FatPoint &in, FatPoint &out) const override;
 
     //! total number of parameters
-    int getNpar() const override { return 2 * _nterms; }
+    std::size_t getNpar() const override { return 2 * _nterms; }
 
     //! print out of coefficients in a readable form.
     void dump(std::ostream &stream = std::cout) const override;
@@ -359,10 +359,10 @@ public:
     double determinant() const;
 
     //!
-    double paramRef(const int i) const override;
+    double paramRef(Eigen::Index const i) const override;
 
     //!
-    double &paramRef(const int i) override;
+    double &paramRef(Eigen::Index const i) override;
 
     //! Derivative w.r.t parameters. Derivatives should be al least 2*NPar long. first Npar, for x, last Npar
     //! for y.
@@ -500,7 +500,7 @@ public:
             : AstrometryTransformLinear(point.x, point.y, 1., 0., 0., 1.){};
     double fit(StarMatchList const &starMatchList);
 
-    int getNpar() const { return 2; }
+    std::size_t getNpar() const { return 2; }
 };
 
 /*=============================================================*/
@@ -514,7 +514,7 @@ public:
                                  const double scaleFactor = 1.0);
     double fit(StarMatchList const &starMatchList);
 
-    int getNpar() const { return 4; }
+    std::size_t getNpar() const { return 4; }
 };
 
 /*=============================================================*/
@@ -530,7 +530,7 @@ public:
     AstrometryTransformLinearScale(const double scaleX, const double scaleY)
             : AstrometryTransformLinear(0.0, 0.0, scaleX, 0., 0., scaleY){};
 
-    int getNpar() const { return 2; }
+    std::size_t getNpar() const { return 2; }
 };
 
 /**

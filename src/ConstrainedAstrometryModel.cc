@@ -222,8 +222,8 @@ const AstrometryTransform &ConstrainedAstrometryModel::getVisitTransform(VisitId
     return visitp->second->getTransform();
 }
 
-int ConstrainedAstrometryModel::getTotalParameters() const {
-    int total = 0;
+std::size_t ConstrainedAstrometryModel::getTotalParameters() const {
+    std::size_t total = 0;
     for (auto &i : _chipMap) {
         total += i.second->getNpar();
     }
