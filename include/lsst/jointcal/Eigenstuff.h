@@ -27,7 +27,31 @@
 
 #include "lsst/pex/exceptions.h"
 
+
+#if 0
 #include "Eigen/CholmodSupport"  // to switch to cholmod
+#else
+// Hack so Eigen uses the correct flavor of cholmod
+#define EIGEN_CHOLMODSUPPORT_MODULE_H
+#include "Eigen/SparseCore"
+#include "Eigen/src/Core/util/DisableStupidWarnings.h"
+extern "C" {
+  #include <cholmod.h>
+}
+#define cholmod_start cholmod_l_start
+#define cholmod_finish cholmod_l_finish
+#define cholmod_analyze cholmod_l_analyze
+#define cholmod_factorize_p cholmod_l_factorize_p
+#define cholmod_solve cholmod_l_solve
+#define cholmod_spsolve cholmod_l_spsolve
+#define cholmod_free_sparse cholmod_l_free_sparse
+#define cholmod_free_dense cholmod_l_free_dense
+#define cholmod_free_factor cholmod_l_free_factor
+#include "Eigen/src/CholmodSupport/CholmodSupport.h"
+#include "Eigen/src/Core/util/ReenableStupidWarnings.h"
+#endif
+
+
 #include "Eigen/Core"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, 2> MatrixX2d;
@@ -72,10 +96,10 @@ public:
         /* We have to apply the magic permutation to the update matrix,
         read page 117 of Cholmod UserGuide.pdf */
         cholmod_sparse *C_cs_perm =
-                cholmod_submatrix(&C_cs, (int *)Base::m_cholmodFactor->Perm, Base::m_cholmodFactor->n,
-                                  nullptr, -1, true, true, &this->cholmod());
+                cholmod_l_submatrix(&C_cs, (Eigen::Index*)Base::m_cholmodFactor->Perm,
+                                  Base::m_cholmodFactor->n, nullptr, -1, true, true, &this->cholmod());
         assert(C_cs_perm);
-        int isOk = cholmod_updown(UpOrDown, C_cs_perm, Base::m_cholmodFactor, &this->cholmod());
+        int isOk = cholmod_l_updown(UpOrDown, C_cs_perm, Base::m_cholmodFactor, &this->cholmod());
         cholmod_free_sparse(&C_cs_perm, &this->cholmod());
         if (!isOk) {
             throw(LSST_EXCEPT(lsst::pex::exceptions::RuntimeError, "cholmod_update failed!"));
