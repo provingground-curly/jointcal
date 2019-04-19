@@ -38,8 +38,10 @@ bool PhotometryModel::validate(CcdImageList const &ccdImageList, int ndof) const
     }
     if (ndof < 1) {
         check &= false;
-        LOGLS_WARN(_log, "Not enough degrees of freedom (" << ndof << ") to fit model with "
-                                                           << getTotalParameters() << " parameters.");
+        LOGLS_ERROR(_log, "Fitting this model requires at least 1 degree of freedom but only "
+                                  << ndof << " available, with " << getTotalParameters()
+                                  << " total parameters. Reduce the model complexity (e.g. polynomial order)"
+                                     " to better match the number of measured sources.");
     }
     return check;
 }

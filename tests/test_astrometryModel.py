@@ -390,9 +390,11 @@ class ConstrainedAstrometryModelTestCase(AstrometryModelTestBase, lsst.utils.tes
         self.checkGetVisitTransform(self.model1)
         self.checkGetVisitTransform(self.model2)
 
-    def test_validate(self):
-        # Model1 has 70 parameters (2 visits*20 params + (6-1) sensors*5 params)
-        # so we need 70+1 degrees of freedom to fit it.
+    def testValidate(self):
+        """Test that invalid models fail validate(), and that valid ones pass.
+        """
+        # We need at least 1 degree of freedom (data - parameters) for the model to be valid.
+        # Note: model1 has 70 total parameters (2 visits*20 params + (6-1) sensors*5 params)
         self.assertTrue(self.model1.validate(self.ccdImageList, 1))
         self.assertFalse(self.model1.validate(self.ccdImageList, 0))
 
