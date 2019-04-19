@@ -45,8 +45,6 @@ namespace lsst {
 namespace jointcal {
 
 /**
- */
-/**
  * A multi-component model, fitting mappings for sensors and visits simultaneously.
  *
  * This is the model used to fit mappings as the combination of a
